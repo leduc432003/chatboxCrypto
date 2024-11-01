@@ -12,6 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.Map;
 
 @Service
@@ -20,16 +25,21 @@ public class ChatbotServiceImpl implements ChatbotService {
     String GEMINI_API_KEY = "AIzaSyBr-JZjwWieU_ms_1WSBYixTbuulnPxhtw";
 
     private double convertToDouble(Object value) {
-        if(value instanceof Integer) {
-            return ((Integer) value).doubleValue();
+        if (value == null) return 0.0;
+        if (value instanceof Number) return ((Number) value).doubleValue();
+        throw new IllegalArgumentException("Unsupported type: " + value.getClass().getName());
+    }
+
+    public Date parseIsoDate(String dateString) {
+        try {
+            // Phân tích chuỗi ngày thành Instant
+            Instant instant = Instant.parse(dateString);
+            return java.util.Date.from(instant); // Chuyển đổi thành java.util.Date nếu cần
+        } catch (DateTimeParseException e) {
+            System.err.println("Failed to parse date: " + dateString);
+            e.printStackTrace();
+            return null; // Hoặc xử lý theo cách khác
         }
-        else if(value instanceof Long) {
-            return ((Long) value).doubleValue();
-        }
-        else if(value instanceof Double) {
-            return (Double)value;
-        }
-        else throw new IllegalArgumentException("unsupported type" + value.getClass().getName());
     }
 
     public CoinDto makeApiRequest(String currencyName) throws Exception {
@@ -61,7 +71,62 @@ public class ChatbotServiceImpl implements ChatbotService {
                     .marketCapChangePercentage24(convertToDouble((marketData.get("market_cap_change_percentage_24h"))))
                     .circulatingSupply(convertToDouble((marketData.get("circulating_supply"))))
                     .totalSupply(convertToDouble((marketData.get("total_supply"))))
+
+                    .ath(convertToDouble(((Map<String, Object>) marketData.get("ath")).get("usd")))
+                    .athChangePercentage(convertToDouble(((Map<String, Object>) marketData.get("ath_change_percentage")).get("usd")))
+//                    .athDate(parseIsoDate((String) ((Map<String, Object>) marketData.get("ath_24h")).get("usd")))
+
+                    .atl(convertToDouble(((Map<String, Object>) marketData.get("atl")).get("usd")))
+                    .atlChangePercentage(convertToDouble(((Map<String, Object>) marketData.get("atl_change_percentage")).get("usd")))
+//                    .atlDate(new Date(((Map<String, Object>) marketData.get("atl_date")).toString()))
+//                    .lastUpdated(new Date(responseBody.get("last_updated").toString()))
                     .build();
+
+            // Phân tích ATH Date
+            Map<String, String> athDateData = (Map<String, String>) marketData.get("ath_date");
+            if (athDateData != null) {
+                String athDateUsd = athDateData.get("usd"); // Lấy giá trị cho USD
+                if (athDateUsd != null) {
+                    Date athDate = parseIsoDate(athDateUsd); // Chuyển đổi chuỗi thành Date
+                    System.out.println("ATH Date: " + athDate);
+                    coinDto.setAthDate(athDate); // Giả sử bạn có setter cho athDate trong CoinDto
+                } else {
+                    System.err.println("ath_date for USD is missing");
+                    coinDto.setAthDate(null);
+                }
+            } else {
+                System.err.println("ath_date data is missing");
+                coinDto.setAthDate(null);
+            }
+
+            // Phân tích ATL Date
+            Map<String, String> atlDateData = (Map<String, String>) marketData.get("atl_date");
+            if (atlDateData != null) {
+                String atlDateUsd = atlDateData.get("usd"); // Lấy giá trị cho USD
+                if (atlDateUsd != null) {
+                    Date atlDate = parseIsoDate(atlDateUsd); // Chuyển đổi chuỗi thành Date
+                    System.out.println("ATL Date: " + atlDate);
+                    coinDto.setAtlDate(atlDate); // Giả sử bạn có setter cho atlDate trong CoinDto
+                } else {
+                    System.err.println("atl_date for USD is missing");
+                    coinDto.setAtlDate(null);
+                }
+            } else {
+                System.err.println("atl_date data is missing");
+                coinDto.setAtlDate(null);
+            }
+
+            // Phân tích Last Updated
+            String lastUpdated = (String) responseBody.get("last_updated");
+            if (lastUpdated != null) {
+                Date lastUpdatedDate = parseIsoDate(lastUpdated); // Chuyển đổi chuỗi thành Date
+                System.out.println("Last Updated: " + lastUpdatedDate);
+                coinDto.setLastUpdated(lastUpdatedDate); // Giả sử bạn có setter cho lastUpdated trong CoinDto
+            } else {
+                System.err.println("Last updated date is missing");
+                coinDto.setLastUpdated(null);
+            }
+
             return coinDto;
         }
         throw new Exception("coin not found");
