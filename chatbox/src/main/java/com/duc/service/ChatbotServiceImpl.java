@@ -32,13 +32,12 @@ public class ChatbotServiceImpl implements ChatbotService {
 
     public Date parseIsoDate(String dateString) {
         try {
-            // Phân tích chuỗi ngày thành Instant
             Instant instant = Instant.parse(dateString);
-            return java.util.Date.from(instant); // Chuyển đổi thành java.util.Date nếu cần
+            return java.util.Date.from(instant);
         } catch (DateTimeParseException e) {
             System.err.println("Failed to parse date: " + dateString);
             e.printStackTrace();
-            return null; // Hoặc xử lý theo cách khác
+            return null;
         }
     }
 
@@ -74,22 +73,17 @@ public class ChatbotServiceImpl implements ChatbotService {
 
                     .ath(convertToDouble(((Map<String, Object>) marketData.get("ath")).get("usd")))
                     .athChangePercentage(convertToDouble(((Map<String, Object>) marketData.get("ath_change_percentage")).get("usd")))
-//                    .athDate(parseIsoDate((String) ((Map<String, Object>) marketData.get("ath_24h")).get("usd")))
-
                     .atl(convertToDouble(((Map<String, Object>) marketData.get("atl")).get("usd")))
                     .atlChangePercentage(convertToDouble(((Map<String, Object>) marketData.get("atl_change_percentage")).get("usd")))
-//                    .atlDate(new Date(((Map<String, Object>) marketData.get("atl_date")).toString()))
-//                    .lastUpdated(new Date(responseBody.get("last_updated").toString()))
                     .build();
 
-            // Phân tích ATH Date
             Map<String, String> athDateData = (Map<String, String>) marketData.get("ath_date");
             if (athDateData != null) {
-                String athDateUsd = athDateData.get("usd"); // Lấy giá trị cho USD
+                String athDateUsd = athDateData.get("usd");
                 if (athDateUsd != null) {
-                    Date athDate = parseIsoDate(athDateUsd); // Chuyển đổi chuỗi thành Date
+                    Date athDate = parseIsoDate(athDateUsd);
                     System.out.println("ATH Date: " + athDate);
-                    coinDto.setAthDate(athDate); // Giả sử bạn có setter cho athDate trong CoinDto
+                    coinDto.setAthDate(athDate);
                 } else {
                     System.err.println("ath_date for USD is missing");
                     coinDto.setAthDate(null);
@@ -99,14 +93,13 @@ public class ChatbotServiceImpl implements ChatbotService {
                 coinDto.setAthDate(null);
             }
 
-            // Phân tích ATL Date
             Map<String, String> atlDateData = (Map<String, String>) marketData.get("atl_date");
             if (atlDateData != null) {
-                String atlDateUsd = atlDateData.get("usd"); // Lấy giá trị cho USD
+                String atlDateUsd = atlDateData.get("usd");
                 if (atlDateUsd != null) {
-                    Date atlDate = parseIsoDate(atlDateUsd); // Chuyển đổi chuỗi thành Date
+                    Date atlDate = parseIsoDate(atlDateUsd);
                     System.out.println("ATL Date: " + atlDate);
-                    coinDto.setAtlDate(atlDate); // Giả sử bạn có setter cho atlDate trong CoinDto
+                    coinDto.setAtlDate(atlDate);
                 } else {
                     System.err.println("atl_date for USD is missing");
                     coinDto.setAtlDate(null);
@@ -116,12 +109,11 @@ public class ChatbotServiceImpl implements ChatbotService {
                 coinDto.setAtlDate(null);
             }
 
-            // Phân tích Last Updated
             String lastUpdated = (String) responseBody.get("last_updated");
             if (lastUpdated != null) {
-                Date lastUpdatedDate = parseIsoDate(lastUpdated); // Chuyển đổi chuỗi thành Date
+                Date lastUpdatedDate = parseIsoDate(lastUpdated);
                 System.out.println("Last Updated: " + lastUpdatedDate);
-                coinDto.setLastUpdated(lastUpdatedDate); // Giả sử bạn có setter cho lastUpdated trong CoinDto
+                coinDto.setLastUpdated(lastUpdatedDate);
             } else {
                 System.err.println("Last updated date is missing");
                 coinDto.setLastUpdated(null);
@@ -262,7 +254,7 @@ public class ChatbotServiceImpl implements ChatbotService {
                                                                                 "symbol, " +
                                                                                 "name, " +
                                                                                 "image, " +
-                                                                                "currency_price," +
+                                                                                "current_price," +
                                                                                 "market_cap, " +
                                                                                 "market_cap_rank, " +
                                                                                 "fully_diluted_valuation, " +
