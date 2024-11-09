@@ -1,5 +1,6 @@
 package com.duc.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -31,4 +32,6 @@ public class CoinDto {
     private double atlChangePercentage;
     private Date atlDate;
     private Date lastUpdated;
+    private double priceChangePercentage1hInCurrency;
+    private double priceChangePercentage7dInCurrency;
 }

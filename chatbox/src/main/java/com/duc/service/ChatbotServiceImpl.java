@@ -66,6 +66,8 @@ public class ChatbotServiceImpl implements ChatbotService {
 
                     .priceChange24h(convertToDouble((marketData.get("price_change_24h"))))
                     .priceChangePercentage24h(convertToDouble((marketData.get("price_change_percentage_24h"))))
+                    .priceChangePercentage1hInCurrency(convertToDouble(((Map<String, Object>) marketData.get("price_change_percentage_1h_in_currency")).get("usd")))
+                    .priceChangePercentage7dInCurrency(convertToDouble(((Map<String, Object>) marketData.get("price_change_percentage_7d_in_currency")).get("usd")))
                     .marketCapChange24h(convertToDouble((marketData.get("market_cap_change_24h"))))
                     .marketCapChangePercentage24(convertToDouble((marketData.get("market_cap_change_percentage_24h"))))
                     .circulatingSupply(convertToDouble((marketData.get("circulating_supply"))))
@@ -174,10 +176,19 @@ public class ChatbotServiceImpl implements ChatbotService {
                                                                 .put("type", "STRING")
                                                                 .put("description",
                                                                         "The currency data id, " +
-                                                                                "symbol current price, " +
+                                                                                "symbol, current price, " +
                                                                                 "image, " +
                                                                                 "market cap rank, " +
-                                                                                "market cap extra..."
+                                                                                "market cap extra, " +
+                                                                                "total volume, " +
+                                                                                "high 24h, " +
+                                                                                "low 24h, " +
+                                                                                "price change 24h, " +
+                                                                                "price change percentage 24h, " +
+                                                                                "circulating supply, " +
+                                                                                "total supply, " +
+                                                                                "ath, " +
+                                                                                "extra..."
                                                                 )))
                                                 .put("required", new JSONArray()
                                                         .put("currencyName")
@@ -259,6 +270,8 @@ public class ChatbotServiceImpl implements ChatbotService {
                                                                                 "market_cap_rank, " +
                                                                                 "fully_diluted_valuation, " +
                                                                                 "total_volume, high_24h, " +
+                                                                                "price_change_percentage_1h_in_currency, " +
+                                                                                "price_change_percentage_7d_in_currency, " +
                                                                                 "low_24h, price_change_24h, " +
                                                                                 "price_change_percentage_24h, " +
                                                                                 "market_cap_change_24h, " +
